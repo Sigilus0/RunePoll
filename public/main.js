@@ -296,11 +296,13 @@ function processMessages(messages) {
         let messageText = snippet.displayMessage || '';
         messageText = messageText.trim().toLowerCase();
         if (!messageText) return;
+        let displayText = snippet.displayMessage || '';
 
         if (isSuperChat && messageText.includes('"')) {
             const match = messageText.match(/"([^"]+)"/);
             if (match) {
                 messageText = match[1];
+                displayText = match[1];
             }
         }
 
@@ -311,7 +313,7 @@ function processMessages(messages) {
         }
 
         if (!votes[messageText]) {
-            votes[messageText] = { weight: weight, displayText: snippet.displayMessage || ''  };
+            votes[messageText] = { weight: weight, displayText: displayText };
         }
         else{
             votes[messageText].weight += weight;
