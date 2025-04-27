@@ -210,14 +210,14 @@ function startPolling() {
     nextPageToken = null;
 
     configValues = {
-        totalTime: parseInt(document.getElementById('totalTime').value) || 180,
-        pollRate: parseInt(document.getElementById('pollRate').value) || 5,
+        totalTime: parseInt(document.getElementById('totalTime').value) || 300,
+        pollRate: parseInt(document.getElementById('pollRate').value) || 0,
         uniqueOnly: document.getElementById('uniqueOnly').checked,
         votesRequired: parseInt(document.getElementById('votesRequired').value) || 3,
-        maxDisplayed: parseInt(document.getElementById('maxDisplayed').value) || 5,
+        maxDisplayed: parseInt(document.getElementById('maxDisplayed').value) || 4,
         membersOnly: document.getElementById('membersOnly').checked,
-        superChatExponent: parseFloat(document.getElementById('superChatExponent').value) || 1,
-        chatsPerAPI: parseInt(document.getElementById('chatsPerAPI').value) || 200
+        superChatExponent: parseFloat(document.getElementById('superChatExponent').value) || 0,
+        chatsPerAPI: parseInt(document.getElementById('chatsPerAPI').value) || 2000
     };
 
     startTime = new Date();
