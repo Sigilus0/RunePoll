@@ -2,18 +2,18 @@ require('dotenv').config();
 const express = require('express');
 const fetch = require('node-fetch');
 const path = require('path');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
-
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 const CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID;
 const { DateTime } = require('luxon');
+let quotaUsed = 0;
+let cachedStreamInfo = null;
+let cachedStreamInfoTimestamp = 0;
+const STREAM_INFO_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
-
-let quotaUsed = 0;
 
 // Reset quota every midnight PST
 function scheduleQuotaReset() {
@@ -44,10 +44,19 @@ async function fetchVideoDetails(videoId) {
 }
 
 app.get('/api/stream-info', async (req, res) => {
+  const now = Date.now();
+
+  // Serve from cache if valid
+  if (cachedStreamInfo && (now - cachedStreamInfoTimestamp < STREAM_INFO_CACHE_TTL)) {
+    console.log('✅ Serving cached stream-info');
+    return res.json(cachedStreamInfo);
+  }
+
   try {
+    // Try to find live broadcasts first
     let apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&type=video&eventType=live&order=date&maxResults=5&key=${YOUTUBE_API_KEY}`;
     let response = await fetch(apiUrl);
-    quotaUsed += 100;
+    quotaUsed += 100; // search.list cost
     let data = await response.json();
 
     let videoId = null;
@@ -55,9 +64,10 @@ app.get('/api/stream-info', async (req, res) => {
     if (data.items && data.items.length > 0) {
       videoId = data.items[0].id.videoId;
     } else {
+      // Try upcoming broadcasts
       apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&type=video&eventType=upcoming&order=date&maxResults=5&key=${YOUTUBE_API_KEY}`;
       response = await fetch(apiUrl);
-      quotaUsed += 100;
+      quotaUsed += 100; // search.list cost
       data = await response.json();
 
       if (data.items && data.items.length > 0) {
@@ -65,42 +75,55 @@ app.get('/api/stream-info', async (req, res) => {
         let details = await Promise.all(
             upcomingVideos.map(async (item) => {
               const detail = await fetchVideoDetails(item.id.videoId);
-              quotaUsed += 1;
+              quotaUsed += 1; // videos.list cost
               return {
                 videoId: item.id.videoId,
                 title: detail.snippet.title,
                 scheduledStartTime: detail.liveStreamingDetails?.scheduledStartTime || null,
-                liveChatId: detail.liveStreamingDetails?.activeLiveChatId || null,
-                quotaUsed
+                liveChatId: detail.liveStreamingDetails?.activeLiveChatId || null
               };
             })
         );
 
+        // Sort upcoming videos by scheduled time
         details.sort((a, b) => {
           return new Date(a.scheduledStartTime) - new Date(b.scheduledStartTime);
         });
 
         const next = details[0];
-        return res.json({
+
+        const responseData = {
           title: next.title,
           scheduledStartTime: next.scheduledStartTime,
           liveChatId: next.liveChatId,
           quotaUsed
-        });
+        };
+
+        cachedStreamInfo = responseData;
+        cachedStreamInfoTimestamp = now;
+
+        return res.json(responseData);
       } else {
         return res.status(404).json({ error: 'No live or upcoming streams found.' });
       }
     }
 
+    // Fetch video details for live stream
     const liveDetails = await fetchVideoDetails(videoId);
-    quotaUsed += 1;
+    quotaUsed += 1; // videos.list cost
 
-    return res.json({
+    const responseData = {
       title: liveDetails.snippet.title,
       scheduledStartTime: liveDetails.liveStreamingDetails?.scheduledStartTime || null,
       liveChatId: liveDetails.liveStreamingDetails?.activeLiveChatId || null,
       quotaUsed
-    });
+    };
+
+    // Save to cache
+    cachedStreamInfo = responseData;
+    cachedStreamInfoTimestamp = now;
+
+    return res.json(responseData);
 
   } catch (error) {
     console.error('Error fetching stream info:', error);
@@ -136,6 +159,7 @@ app.post('/api/live-chat', async (req, res) => {
       pollingIntervalMillis: data.pollingIntervalMillis || null,
       quotaUsed
     });
+    
   } catch (error) {
     console.error('Error fetching live chat messages:', error);
     return res.status(500).json({ error: 'Internal server error' });
