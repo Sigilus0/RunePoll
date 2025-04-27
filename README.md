@@ -26,6 +26,7 @@ or the actual environment of your server process:
 - 'Members Only' if enabled, only members votes count, except superchats.
    Discriminate against the poor with a single click!
 - 'Super Chat Exponent' modified the superchat weight by tier^exponent - see chart
+<pre>
    ----------------------------------
    |        |  0  |  1  |  2  |  3  |
    ----------------------------------
@@ -43,6 +44,7 @@ or the actual environment of your server process:
    ----------------------------------
    |$100(7) |  1  |  7  | 49  | 343 |
    ----------------------------------
+</pre>
    3.1 is the correct solution to scale weight of the vote proportional to the USD spent.
    However this can drown out the rest of chat. Also does not convert currency, so ARS spam
    could be a problem. Using a number >0, <3.1 may encourage lower super chat tiers. 
