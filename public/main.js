@@ -175,6 +175,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 async function fetchLivestreamTitle() {
+/*   
     try {
         const res = await fetch('/api/stream-info');
         const data = await res.json();
@@ -191,6 +192,10 @@ async function fetchLivestreamTitle() {
     } catch (error) {
         console.error('Error fetching livestream info:', error);
     }
+*/
+    const titleElem = document.querySelector('.title');
+    titleElem.textContent = `Polling "Can you find me?" [manual override]`;
+    liveChatId = 'Cg0KC205V3BjanF2QUNFKicKGFVDb0FRc2MtRFEwTWpmVHAwNTlvdFFBdxILbTlXcGNqcXZBQ0U';
 }
 
 function startPolling() {
