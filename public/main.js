@@ -3,11 +3,11 @@ let liveChatId = null;
 let startTime = null;
 let stopTime = null;
 let pollTimer = null;
-let pollingInterval = null;
 let nextPageToken = null;
 let votes = {};
 let voters = new Set();
 let pollingActive = false;
+let timerInterval = null;
 
 // DOM elements
 const startButton = document.getElementById('startButton');
@@ -15,6 +15,9 @@ const configToggleBtn = document.querySelector('.toggle-config');
 const configContent = document.querySelector('.config-content');
 const resultsContent = document.getElementById('resultsContent');
 const quotaDisplay = document.getElementById('quotaDisplay');
+const timerBar = document.getElementById('poll-timer-fill');
+const timerText = document.getElementById('poll-timer-text');
+
 const supportedEmotes = new Set([
     'runieBUGGY',
     'runieCHEERS',
@@ -172,6 +175,7 @@ startButton.addEventListener('click', () => {
 window.addEventListener('DOMContentLoaded', () => {
     loadConfigFromCookies();
     fetchLivestreamTitle();
+    timerBar.style.width = `0%`;
 });
 
 async function fetchLivestreamTitle() {
@@ -228,6 +232,9 @@ function startPolling() {
     startTime = new Date();
     stopTime = new Date(startTime.getTime() + configValues.totalTime * 1000);
 
+    updateTimerBar();
+    timerInterval = setInterval(updateTimerBar, 1000);
+
     pollChat();
 }
 
@@ -240,6 +247,9 @@ function stopPolling() {
     if (pollTimer) {
         clearTimeout(pollTimer);
     }
+    clearInterval(timerInterval);
+    timerBar.style.width = '0%';
+    timerText.textContent = '00:00';
 }
 
 async function pollChat() {
@@ -384,5 +394,24 @@ function updateDisplay() {
 
 function updateQuotaDisplay(used) {
     quotaDisplay.textContent = `${used}/10000`;
+}
+
+function updateTimerBar() {
+    const now = Date.now();
+    const total = stopTime.getTime() - startTime.getTime();
+    const remaining = Math.max(0, stopTime.getTime() - now);
+    const percent = (remaining / total) * 100;
+
+    timerBar.style.width = `${percent}%`;
+
+    // Always update text from absolute time left
+    const secondsLeft = Math.ceil(remaining / 1000);
+    const min = Math.floor(secondsLeft / 60);
+    const sec = secondsLeft % 60;
+    timerText.textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+
+    if (remaining <= 0) {
+        clearInterval(timerInterval);
+    }
 }
 

@@ -10,20 +10,20 @@ body {
 
 /* Header layout */
 .header {
-    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     max-width: 1000px;
     margin: 0 auto 20px auto;
-    overflow: hidden;
+    padding: 0 10px;
 }
 
 .title {
     font-size: 1.5em;
     font-weight: bold;
-    float: left;
 }
 
 #startButton {
-    float: right;
     background-color: #28a745;
     color: white;
     border: 2px solid white;
@@ -34,7 +34,6 @@ body {
     font-weight: bold;
 }
 
-/* Clear floats */
 .clearfix::after {
     content: "";
     display: table;
@@ -117,3 +116,40 @@ body {
     font-size: 0.85em;
     vertical-align: middle;
 }
+
+#poll-timer-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+#poll-timer-bar {
+    flex-grow: 1;
+    height: 18px;
+    background-color: #444;
+    border: 1px solid white;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#poll-timer-fill {
+    height: 100%;
+    width: 100%;
+    background-color: #4caf50;
+    transition: width 0.3s linear;
+}
+
+#poll-timer-text {
+    min-width: 50px;
+    font-family: monospace;
+    color: white;
+}
+
+.timer-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
