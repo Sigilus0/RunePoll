@@ -49,6 +49,9 @@ or the actual environment of your server process:
    However this can drown out the rest of chat. Also does not convert currency, so ARS spam
    could be a problem. Using a number >0, <3.1 may encourage lower super chat tiers. 
 - `Chats/API call` Maximum amount of chats youtube may return for a single API call. 
-   Set to 2000, it causes no issues and if lowered with a fast chat messages may be missed
+   Set to 2000, it causes no issues and if lowered with a fast chat messages may be missed.
+- `Select Stream` Prompts you to enter a new video ID e.g. "m9WpcjqvACE" for stream
+   https://www.youtube.com/watch?v=m9WpcjqvACE. Use to find unlisted streams, entered ID
+   must be a valid live or upcoming stream belonging to the correct channel.
 - `API Quota` Lies to you. Reset when the server restarts so is not accurate, but can give
    an indication that the server is doing something so thats pretty neat.

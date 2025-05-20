@@ -166,6 +166,40 @@ app.post('/api/live-chat', async (req, res) => {
   }
 });
 
+app.post('/api/override-stream', async (req, res) => {
+  const { videoId } = req.body;
+  if (!videoId) return res.status(400).json({ error: "Missing video ID" });
+
+  try {
+    const video = await fetchVideoDetails(videoId);
+
+    if (!video || !video.snippet || !video.liveStreamingDetails) {
+      return res.json({ error: "Invalid or missing stream details" });
+    }
+
+    const broadcastStatus = video.snippet.liveBroadcastContent;
+    if (broadcastStatus !== 'live' && broadcastStatus !== 'upcoming') {
+      return res.json({ error: `Stream is not live or upcoming` });
+    }
+
+    if (video.snippet.channelId !== CHANNEL_ID) {
+      return res.json({ error: "Stream does not belong to this channel" });
+    }
+
+    const liveChatId = video.liveStreamingDetails.activeLiveChatId || null;
+
+    return res.json({
+      title: video.snippet.title,
+      liveChatId,
+      quotaUsed
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to override stream." });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`✅ Server running at http://localhost:${PORT}`);
 });

@@ -17,6 +17,7 @@ const resultsContent = document.getElementById('resultsContent');
 const quotaDisplay = document.getElementById('quotaDisplay');
 const timerBar = document.getElementById('poll-timer-fill');
 const timerText = document.getElementById('poll-timer-text');
+const overrideBtn = document.getElementById('overrideBtn');
 
 const supportedEmotes = new Set([
     'runieBUGGY',
@@ -163,6 +164,28 @@ function applyConfigPreset(preset) {
     document.getElementById('chatsPerAPI').value = preset.chatsPerAPI;
 }
 
+overrideBtn.addEventListener('click', async () => {
+    const videoId = prompt("Enter YouTube video ID:");
+    if (!videoId) return;
+
+    const res = await fetch('/api/override-stream', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ videoId })
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+        alert("Error: " + data.error);
+    } else {
+        const titleElem = document.querySelector('.title');
+        titleElem.textContent = `Polling ${data.title}`;
+        liveChatId = data.liveChatId || null;
+        updateQuotaDisplay(data.quotaUsed);
+    }
+});
+
 // Start/Stop button
 startButton.addEventListener('click', () => {
     if (!pollingActive) {
@@ -172,14 +195,14 @@ startButton.addEventListener('click', () => {
     }
 });
 
+timerBar.style.width = `0%`;
+
 window.addEventListener('DOMContentLoaded', () => {
     loadConfigFromCookies();
     fetchLivestreamTitle();
-    timerBar.style.width = `0%`;
 });
 
 async function fetchLivestreamTitle() {
-/*   
     try {
         const res = await fetch('/api/stream-info');
         const data = await res.json();
@@ -196,10 +219,6 @@ async function fetchLivestreamTitle() {
     } catch (error) {
         console.error('Error fetching livestream info:', error);
     }
-*/
-    const titleElem = document.querySelector('.title');
-    titleElem.textContent = `Polling "Can you find me?" [manual override]`;
-    liveChatId = 'Cg0KC205V3BjanF2QUNFKicKGFVDb0FRc2MtRFEwTWpmVHAwNTlvdFFBdxILbTlXcGNqcXZBQ0U';
 }
 
 function startPolling() {
