@@ -123,7 +123,7 @@ body {
     gap: 10px;
     padding: 5px 10px;
     margin-top: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 #poll-timer-bar {
@@ -153,3 +153,18 @@ body {
     margin: 0 auto;
 }
 
+#extend-timer-wrapper {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+#extendTimerBtn {
+    padding: 4px 10px;
+    background-color: #444;
+    color: white;
+    font-weight: bold;
+    border: 1px solid white;
+    border-radius: 4px;
+    cursor: pointer;
+}

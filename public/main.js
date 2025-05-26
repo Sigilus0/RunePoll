@@ -18,6 +18,8 @@ const quotaDisplay = document.getElementById('quotaDisplay');
 const timerBar = document.getElementById('poll-timer-fill');
 const timerText = document.getElementById('poll-timer-text');
 const overrideBtn = document.getElementById('overrideBtn');
+const extendTimerBtn = document.getElementById('extendTimerBtn');
+
 
 const supportedEmotes = new Set([
     'runieBUGGY',
@@ -434,3 +436,9 @@ function updateTimerBar() {
     }
 }
 
+extendTimerBtn.addEventListener('click', () => {
+    if (!pollingActive) return;
+
+    stopTime = new Date(stopTime.getTime() + 30000);
+    updateTimerBar();
+});
