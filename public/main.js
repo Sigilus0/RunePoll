@@ -42,7 +42,7 @@ const supportedEmotes = new Set([
     'runieTAMBO',
     'runieROSE',
     'runieHIHI',
-    'runieGRRR'
+    'runieGRRR',
     'runieLMAO',
     'runieENERU'
 ]);
