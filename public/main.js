@@ -38,7 +38,13 @@ const supportedEmotes = new Set([
     'runieSOB',
     'runieUwow',
     'runieWOTA',
-    'runieYAP'
+    'runieYAP',
+    'runieTAMBO',
+    'runieROSE',
+    'runieHIHI',
+    'runieGRRR',
+    'runieLMAO',
+    'runieENERU'
 ]);
 // Config fields
 const configFields = [
