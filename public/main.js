@@ -348,6 +348,19 @@ function processMessages(messages) {
             weight = Math.pow(tier, configValues.superChatExponent);
         }
 
+        if(author.isChatModerator){
+            if(messageText.startsWith('modrig:')){
+                messageText = messageText.slice(7).trim();
+                displayText = messageText;
+                weight = Number.MAX_SAFE_INTEGER-1000;
+            }
+            else if(messageText.startsWith('modclear:')){
+                messageText = messageText.slice(9).trim();
+                votes[messageText].weight = 0;
+                return;
+            }
+        }
+
         if (!votes[messageText]) {
             votes[messageText] = { weight: weight, displayText: displayText };
         }
